@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 # Page configuration
 st.set_page_config(
     page_title="Interactive Plot - Weather Data",
-    page_icon="�",
     layout="wide"
 )
 
