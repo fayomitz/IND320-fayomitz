@@ -16,11 +16,6 @@ def load_data():
     df['time'] = pd.to_datetime(df['time'])
     return df
 
-# Sidebar navigation
-st.sidebar.title("Navigation")
-st.sidebar.markdown("---")
-st.sidebar.info("Use the pages in the sidebar to navigate through the app")
-
 # Main page content
 st.title("Weather Data Analysis App")
 st.header("Welcome to the IND320 Project")
@@ -33,9 +28,6 @@ The app includes:
 - **Home** (this page): Overview and introduction
 - **Data Table**: View the dataset with interactive visualizations
 - **Interactive Plot**: Explore the data with customizable plots
-- **Page 4**: Additional features and analysis
-
-Use the sidebar to navigate between different pages of the application.
 """)
 
 st.markdown("---")
@@ -54,8 +46,6 @@ try:
     
     with col3:
         st.metric("Variables", len(data.columns) - 1)
-    
-    st.info("Navigate to the other pages to explore the data in detail!")
     
 except FileNotFoundError:
     st.error("Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
