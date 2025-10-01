@@ -4,7 +4,6 @@ import pandas as pd
 # Page configuration
 st.set_page_config(
     page_title="IND320 Weather Data App",
-    page_icon="☁",
     layout="wide"
 )
 
