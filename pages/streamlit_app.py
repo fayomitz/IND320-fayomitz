@@ -4,7 +4,7 @@ import pandas as pd
 # Page configuration
 st.set_page_config(
     page_title="IND320 Weather Data App",
-    page_icon="🌦️",
+    page_icon="☁",
     layout="wide"
 )
 
@@ -22,7 +22,7 @@ st.sidebar.markdown("---")
 st.sidebar.info("Use the pages in the sidebar to navigate through the app")
 
 # Main page content
-st.title("🌦️ Weather Data Analysis App")
+st.title("Weather Data Analysis App")
 st.header("Welcome to the IND320 Project")
 
 st.markdown("""
@@ -55,7 +55,7 @@ try:
     with col3:
         st.metric("Variables", len(data.columns) - 1)
     
-    st.info("📊 Navigate to the other pages to explore the data in detail!")
+    st.info("Navigate to the other pages to explore the data in detail!")
     
 except FileNotFoundError:
-    st.error("⚠️ Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
+    st.error("Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")

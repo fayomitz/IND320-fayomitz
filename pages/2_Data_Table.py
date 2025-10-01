@@ -4,7 +4,7 @@ import pandas as pd
 # Page configuration
 st.set_page_config(
     page_title="Data Table - Weather Data",
-    page_icon="📊",
+    page_icon="�",
     layout="wide"
 )
 
@@ -23,7 +23,7 @@ def get_first_month_data(df, column):
     return first_month[['time', column]].head(744)  # First month (up to 31 days * 24 hours)
 
 # Main page content
-st.title("📊 Data Table View")
+st.title("Data Table View")
 st.header("Weather Data Overview with First Month Visualization")
 
 st.markdown("""
@@ -88,9 +88,9 @@ try:
     )
     
     st.markdown("---")
-    st.info(f"📈 Showing statistics and first month trends for {len(data_columns)} variables across {len(data):,} total records")
+    st.info(f"Showing statistics and first month trends for {len(data_columns)} variables across {len(data):,} total records")
     
 except FileNotFoundError:
-    st.error("⚠️ Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
+    st.error("Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")

@@ -6,7 +6,7 @@ from datetime import datetime
 # Page configuration
 st.set_page_config(
     page_title="Interactive Plot - Weather Data",
-    page_icon="📈",
+    page_icon="�",
     layout="wide"
 )
 
@@ -25,7 +25,7 @@ def get_unique_months(df):
     return sorted([str(m) for m in months])
 
 # Main page content
-st.title("📈 Interactive Weather Data Plot")
+st.title("Interactive Weather Data Plot")
 st.header("Explore the Data with Custom Visualizations")
 
 st.markdown("""
@@ -138,10 +138,10 @@ try:
         with stats_col4:
             st.metric("Max", f"{col_stats['max']:.2f}")
     
-    st.info(f"📊 Displaying {len(filtered_data):,} data points for the selected period")
+    st.info(f"Displaying {len(filtered_data):,} data points for the selected period")
     
 except FileNotFoundError:
-    st.error("⚠️ Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
+    st.error("Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")
     st.exception(e)
