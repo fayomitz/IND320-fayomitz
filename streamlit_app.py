@@ -27,6 +27,7 @@ The app includes:
 - **Home** (this page): Overview and introduction
 - **Data Table**: View the dataset with interactive visualizations
 - **Interactive Plot**: Explore the data with customizable plots
+- **Placeholder Page**: Under construction
 """)
 
 st.markdown("---")
