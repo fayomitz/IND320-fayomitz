@@ -1,4 +1,8 @@
+ipykernel
 pandas
 numpy
 matplotlib
 streamlit
+pymongo[srv]==3.12
+pyspark==3.5.1
+cassandra-driver
