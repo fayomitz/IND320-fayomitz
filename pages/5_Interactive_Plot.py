@@ -8,13 +8,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# Cache the data loading function for performance
-@st.cache_data
-def load_data():
-    """Load the weather data from CSV file with caching for app speed"""
-    df = pd.read_csv('open-meteo-subset.csv')
-    df['time'] = pd.to_datetime(df['time'])
-    return df
+# Load weather data from session state
+def get_weather_data():
+    """Get weather data from session state (set by page 2)"""
+    if 'weather_data' in st.session_state and st.session_state.weather_data is not None:
+        return st.session_state.weather_data
+    return None
 
 def get_unique_months(df):
     """Get list of unique year-month combinations from the dataframe"""
@@ -32,9 +31,18 @@ Use the controls below to customize your view of the weather data.
 
 st.markdown("---")
 
-try:
-    # Load the data
-    data = load_data()
+# Check if weather data is available
+data = get_weather_data()
+
+if data is None:
+    st.warning("⚠️ No weather data loaded. Please visit the **Price Area Selector** page first to download weather data.")
+    st.info("Once you download data on that page, it will be available here for interactive plotting.")
+else:
+    st.success(f"✅ Weather data loaded: {len(data)} records")
+    if 'selected_area' in st.session_state:
+        st.info(f"📍 Data for: **{st.session_state.selected_area}** ({st.session_state.selected_city})")
+    
+    try:
     
     # Get all columns except 'time'
     data_columns = [col for col in data.columns if col != 'time']
@@ -136,10 +144,8 @@ try:
         with stats_col4:
             st.metric("Max", f"{col_stats['max']:.2f}")
     
-    st.info(f"Displaying {len(filtered_data):,} data points for the selected period")
-    
-except FileNotFoundError:
-    st.error("Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
-except Exception as e:
-    st.error(f"An error occurred: {str(e)}")
-    st.exception(e)
+        st.info(f"Displaying {len(filtered_data):,} data points for the selected period")
+        
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        st.exception(e)

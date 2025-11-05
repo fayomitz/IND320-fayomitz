@@ -7,13 +7,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# Cache the data loading function for performance
-@st.cache_data
-def load_data():
-    """Load the weather data from CSV file with caching for app speed"""
-    df = pd.read_csv('open-meteo-subset.csv')
-    df['time'] = pd.to_datetime(df['time'])
-    return df
+# Load weather data from session state
+def get_weather_data():
+    """Get weather data from session state (set by page 2)"""
+    if 'weather_data' in st.session_state and st.session_state.weather_data is not None:
+        return st.session_state.weather_data
+    return None
 
 def get_first_month_data(df, column):
     """Extract the first month of data for a specific column"""
@@ -32,9 +31,18 @@ the first month of data for each variable.
 
 st.markdown("---")
 
-try:
-    # Load the data
-    data = load_data()
+# Check if weather data is available
+data = get_weather_data()
+
+if data is None:
+    st.warning("⚠️ No weather data loaded. Please visit the **Price Area Selector** page first to download weather data.")
+    st.info("Once you download data on that page, it will be available here for viewing.")
+else:
+    st.success(f"✅ Weather data loaded: {len(data)} records")
+    if 'selected_area' in st.session_state:
+        st.info(f"📍 Data for: **{st.session_state.selected_area}** ({st.session_state.selected_city})")
+    
+    try:
     
     st.subheader("Dataset with First Month Line Charts")
     st.markdown("Each row represents a variable from the dataset, with a line chart showing the first month of data.")
@@ -87,9 +95,8 @@ try:
     )
     
     st.markdown("---")
-    st.info(f"Showing statistics and first month trends for {len(data_columns)} variables across {len(data):,} total records")
-    
-except FileNotFoundError:
-    st.error("Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
-except Exception as e:
-    st.error(f"An error occurred: {str(e)}")
+        st.info(f"Showing statistics and first month trends for {len(data_columns)} variables across {len(data):,} total records")
+        
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        st.exception(e)
