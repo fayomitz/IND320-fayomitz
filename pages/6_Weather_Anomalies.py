@@ -23,7 +23,7 @@ def detect_temperature_outliers(df, freq_cutoff=0.05, n_std=3):
     Detect temperature outliers using DCT and SPC
     """
     # Extract temperature data
-    temp = df['temperature_2m (°C)'].fillna(method='ffill').fillna(method='bfill').values
+    temp = df['temperature_2m (°C)'].ffill().bfill().values
     time = pd.to_datetime(df['time'])
     
     # Apply DCT
@@ -92,7 +92,7 @@ def detect_temperature_outliers(df, freq_cutoff=0.05, n_std=3):
     
     return results
 
-def detect_precipitation_anomalies(df, outlier_proportion=0.01):
+def detect_precipitation_anomalies(df, outlier_proportion=0.01, n_neighbors=50):
     """
     Detect precipitation anomalies using LOF
     """
@@ -104,9 +104,13 @@ def detect_precipitation_anomalies(df, outlier_proportion=0.01):
     precip_diff = np.diff(precip, prepend=precip[0])
     X = np.column_stack([precip, precip_diff])
     
+    # Add small jitter to handle duplicate values (common with zero precipitation)
+    jitter = np.random.RandomState(42).normal(0, 1e-6, X.shape)
+    X_jittered = X + jitter
+    
     # Fit LOF
-    lof = LocalOutlierFactor(n_neighbors=20, contamination=outlier_proportion)
-    predictions = lof.fit_predict(X)
+    lof = LocalOutlierFactor(n_neighbors=n_neighbors, contamination=outlier_proportion)
+    predictions = lof.fit_predict(X_jittered)
     lof_scores = lof.negative_outlier_factor_
     
     # Identify anomalies
@@ -239,10 +243,10 @@ else:
                 if results['n_outliers'] > 0:
                     with st.expander("🔍 View Outlier Details"):
                         outlier_df = pd.DataFrame({
-                            'Date': results['outlier_dates'],
+                            'Date': [d.strftime('%Y-%m-%d %H:%M:%S') if hasattr(d, 'strftime') else str(d) for d in results['outlier_dates']],
                             'Temperature (°C)': [f"{v:.2f}" for v in results['outlier_values']]
                         })
-                        st.dataframe(outlier_df, use_container_width=True, height=300)
+                        st.dataframe(outlier_df, width='stretch', height=300)
                 
                 st.info("""
                 **Interpretation:**
@@ -263,15 +267,28 @@ else:
         """)
         
         # Controls
-        outlier_prop = st.slider(
-            "Expected Outlier Proportion",
-            min_value=0.001,
-            max_value=0.05,
-            value=0.01,
-            step=0.001,
-            format="%.3f",
-            help="Expected proportion of anomalies (1% = 0.01)"
-        )
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            outlier_prop = st.slider(
+                "Expected Outlier Proportion",
+                min_value=0.001,
+                max_value=0.05,
+                value=0.01,
+                step=0.001,
+                format="%.3f",
+                help="Expected proportion of anomalies (1% = 0.01)"
+            )
+        
+        with col2:
+            n_neighbors = st.slider(
+                "Number of Neighbors",
+                min_value=20,
+                max_value=200,
+                value=50,
+                step=10,
+                help="Higher values reduce impact of duplicate values"
+            )
         
         st.info(f"Expecting approximately {int(len(weather_df) * outlier_prop)} anomalies out of {len(weather_df)} data points")
         
@@ -280,7 +297,8 @@ else:
             with st.spinner("Analyzing precipitation data..."):
                 results = detect_precipitation_anomalies(
                     weather_df,
-                    outlier_proportion=outlier_prop
+                    outlier_proportion=outlier_prop,
+                    n_neighbors=n_neighbors
                 )
                 
                 st.pyplot(results['figure'])
@@ -302,11 +320,11 @@ else:
                     with st.expander("🔍 View Anomaly Details (Top 20)"):
                         # Sort by precipitation value
                         anomaly_df = pd.DataFrame({
-                            'Date': results['anomaly_dates'],
+                            'Date': [d.strftime('%Y-%m-%d %H:%M:%S') if hasattr(d, 'strftime') else str(d) for d in results['anomaly_dates']],
                             'Precipitation (mm)': results['anomaly_values']
                         })
                         anomaly_df = anomaly_df.sort_values('Precipitation (mm)', ascending=False)
-                        st.dataframe(anomaly_df.head(20), use_container_width=True, height=400)
+                        st.dataframe(anomaly_df.head(20), width='stretch', height=400)
                 
                 st.info("""
                 **Interpretation:**

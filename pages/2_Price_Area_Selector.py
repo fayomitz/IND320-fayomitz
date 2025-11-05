@@ -97,9 +97,9 @@ try:
     
     selected_year = st.selectbox(
         "Choose a year for weather data:",
-        options=list(range(2024, 1939, -1)),  # ERA5 data available from 1940 onwards
+        options=list(range(2024, 2009, -1)),  # API data available from 2010 onwards
         index=1,  # Default to 2023 (index 1 in the list)
-        help="Select any year from 1940 to 2024 (ERA5 historical data)"
+        help="Select any year from 2010 to 2024"
     )
     
     st.info(f"📆 Selected year: **{selected_year}**")
@@ -112,7 +112,7 @@ try:
     with col1:
         st.write(f"Click the button below to download {selected_year} weather data from Open-Meteo API for the selected price area.")
     with col2:
-        download_button = st.button("📥 Download Data", type="primary", use_container_width=True)
+        download_button = st.button("📥 Download Data", type="primary", width='stretch')
     
     if download_button:
         with st.spinner(f"Downloading weather data for {selected_city} ({selected_year})..."):
@@ -146,11 +146,15 @@ try:
                 
                 # Show preview
                 with st.expander("🔍 Preview Data (First 10 rows)"):
-                    st.dataframe(weather_data.head(10), use_container_width=True)
+                    preview_data = weather_data.head(10).copy()
+                    preview_data['time'] = preview_data['time'].astype(str)
+                    st.dataframe(preview_data, width='stretch')
                 
                 # Show statistics
                 with st.expander("📈 Statistical Summary"):
-                    st.dataframe(weather_data.describe(), use_container_width=True)
+                    # Exclude time column from statistics to avoid Arrow serialization issues
+                    numeric_cols = weather_data.select_dtypes(include='number').columns
+                    st.dataframe(weather_data[numeric_cols].describe(), width='stretch')
                 
             except Exception as e:
                 st.error(f"❌ Error downloading weather data: {str(e)}")
@@ -192,7 +196,7 @@ try:
         - `wind_direction_10m (°)`: Wind direction (0-360°)
         
         **Coverage:**
-        - **Years:** 1940-2024 (ERA5 reanalysis data)
+        - **Years:** 2010-2024
         - **Frequency:** Hourly
         - **Locations:** Major cities representing each Norwegian price area
         

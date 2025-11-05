@@ -57,7 +57,7 @@ def stl_analysis(df, price_area, production_group, period=24, seasonal=7, trend=
     )
     
     # Handle missing values
-    ts = ts.fillna(method='ffill').fillna(method='bfill')
+    ts = ts.ffill().bfill()
     
     # Perform STL decomposition
     stl = STL(ts, period=period, seasonal=seasonal, trend=trend, robust=robust)
@@ -112,7 +112,7 @@ def spectrogram_analysis(df, price_area, production_group, window_length=168, wi
     production = filtered['quantityKwh'].values
     
     # Handle missing values
-    production = pd.Series(production).fillna(method='ffill').fillna(method='bfill').values
+    production = pd.Series(production).ffill().bfill().values
     
     # Compute STFT
     frequencies, times, Sxx = signal.spectrogram(
