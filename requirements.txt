@@ -8,3 +8,7 @@ pyspark==3.5.1
 cassandra-driver
 python-dotenv
 pytz
+scikit-learn
+scipy
+statsmodels
+requests
