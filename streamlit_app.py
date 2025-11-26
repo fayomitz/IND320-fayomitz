@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from utils import render_sidebar_info
 
 # Page configuration
 st.set_page_config(
@@ -7,13 +8,8 @@ st.set_page_config(
     layout="wide"
 )
 
-# Cache the data loading function for performance
-@st.cache_data
-def load_data():
-    """Load the weather data from CSV file with caching for app speed"""
-    df = pd.read_csv('open-meteo-subset.csv')
-    df['time'] = pd.to_datetime(df['time'])
-    return df
+# Render sidebar data info
+render_sidebar_info()
 
 # Main page content
 st.title("Weather Data Analysis App")
@@ -24,28 +20,41 @@ st.markdown("""
 This is a Streamlit application for analyzing weather data from Open-Meteo.
 
 The app includes:
-- **Home** (this page): Overview and introduction
-- **Data Table**: View the dataset with interactive visualizations
-- **Interactive Plot**: Explore the data with customizable plots
-- **Placeholder Page**: Under construction
+- **Map & Selector**: Select location and download data
+- **Data Exploration**: View raw data and interactive plots
+- **Snow Drift**: Analyze snow transport and fence requirements
+- **Advanced Analysis**: STL decomposition and Spectrograms
+- **Anomalies**: Detect weather anomalies
+- **Correlations**: Analyze Weather vs Energy relationships
+- **Forecasting**: Predict future energy production
 """)
 
 st.markdown("---")
 
-# Display some basic info about the dataset
-st.subheader("Dataset Information")
-try:
-    data = load_data()
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.metric("Total Records", f"{len(data):,}")
-    
-    with col2:
-        st.metric("Date Range", f"{data['time'].min().date()} to {data['time'].max().date()}")
-    
-    with col3:
-        st.metric("Variables", len(data.columns) - 1)
-    
-except FileNotFoundError:
-    st.error("Data file 'open-meteo-subset.csv' not found. Please ensure the file is in the same directory as this app.")
+# Quick Navigation
+st.subheader("Quick Navigation")
+
+col_nav1, col_nav2, col_nav3 = st.columns(3)
+
+with col_nav1:
+    st.markdown("#### 📊 Data Exploration")
+    if st.button("📍 Map Selector", use_container_width=True, key="main_map"):
+        st.switch_page("pages/01_Map_Selector.py")
+    if st.button("📈 Interactive Plot", use_container_width=True, key="main_plot"):
+        st.switch_page("pages/02_Interactive_Plot.py")
+
+with col_nav2:
+    st.markdown("#### 🔬 Analysis")
+    if st.button("❄️ Snow Drift", use_container_width=True, key="main_snow"):
+        st.switch_page("pages/03_Snow_Drift.py")
+    if st.button("📊 Advanced Analysis", use_container_width=True, key="main_advanced"):
+        st.switch_page("pages/04_Advanced_Analysis.py")
+    if st.button("⚠️ Weather Anomalies", use_container_width=True, key="main_anomalies"):
+        st.switch_page("pages/05_Weather_Anomalies.py")
+
+with col_nav3:
+    st.markdown("#### 🔮 Predictive")
+    if st.button("🔗 Correlations", use_container_width=True, key="main_corr"):
+        st.switch_page("pages/06_Correlations.py")
+    if st.button("📉 Forecasting", use_container_width=True, key="main_forecast"):
+        st.switch_page("pages/07_Forecasting.py")

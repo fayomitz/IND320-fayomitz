@@ -12,3 +12,8 @@ scikit-learn
 scipy
 statsmodels
 requests
+folium
+streamlit-folium
+branca
+plotly
+shapely
